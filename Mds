@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensi Optimizer Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --accent-purple: #9333ea;
+            --bg-dark: #000000;
+            --card-dark: #0a0a0a;
+            --border-dark: #1f1f1f;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .main-stage {
+            width: 95%;
+            max-width: 750px;
+            height: 640px;
+            position: relative;
+            overflow: hidden;
+            background: var(--card-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 40px;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9);
+        }
+
+        .flow-container {
+            display: flex;
+            width: 300%;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .view-step {
+            width: 33.333%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .dashboard-layout { display: flex; height: 100%; width: 100%; position: relative; }
+
+        .sidebar {
+            width: 140px;
+            background: #050505;
+            border-right: 1px solid var(--border-dark);
+            display: flex;
+            flex-direction: column;
+            padding: 60px 15px 20px;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            padding: 14px 10px;
+            border-radius: 18px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #444;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active { color: white; background: var(--accent-purple); }
+
+        .content-display { flex: 1; padding: 30px 40px; overflow-y: auto; position: relative; }
+
+        .btn-primary {
+            background: var(--accent-purple);
+            padding: 18px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 16px;
+            width: 100%;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 18px;
+            border-radius: 20px;
+            font-weight: 700;
+            color: #888;
+            width: 100%;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .tiktok-fixed {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            z-index: 100;
+            background: #ffffff;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+        }
+        .tiktok-fixed:hover { transform: scale(1.1) rotate(8deg); }
+
+        .refresh-circle {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 55px;
+            height: 55px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(147, 51, 234, 0.5);
+            z-index: 50;
+            transition: all 0.3s;
+        }
+        .refresh-circle:active { transform: scale(0.9) rotate(180deg); }
+
+        .suggestion-box {
+            background: rgba(147, 51, 234, 0.1);
+            border: 1px dashed var(--accent-purple);
+            padding: 12px;
+            border-radius: 15px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .tip-card {
+            background: rgba(255, 255, 255, 0.04);
+            border-left: 4px solid var(--accent-purple);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="main-stage">
+        <div id="btnBack" class="absolute top-8 left-8 text-purple-600 cursor-pointer z-50 hidden" onclick="goBack()">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="3" d="M15 19l-7-7 7-7"/></svg>
+        </div>
+
+        <a href="https://www.tiktok.com/@strangkingjz7?_r=1&_t=ZS-92aajEH3CQD" target="_blank" class="tiktok-fixed">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="#000000"><path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104Z"/></svg>
+        </a>
+
+        <div class="flow-container" id="flow">
+            <!-- PASSO 1 -->
+            <div class="view-step">
+                <div id="step1-detect" class="text-center fade-in">
+                    <h2 class="text-purple-500 font-bold text-xs uppercase tracking-widest mb-2">Sensi Optimizer</h2>
+                    <h1 class="text-3xl font-extrabold mb-10">iPhone / iPad<br><span class="text-purple-600">Este é o teu telemóvel?</span></h1>
+                    <div class="space-y-4 max-w-xs mx-auto">
+                        <button onclick="confirmHardware('iPhone (iOS)', true)" class="btn-primary text-white w-full">Sim Esse E Meu Celular</button>
+                        <button onclick="showManualInput()" class="btn-secondary w-full">Nao, Uso Outro Modelo</button>
+                    </div>
+                </div>
+
+                <div id="step1-manual" class="hidden text-center fade-in">
+                    <h1 class="text-3xl font-extrabold mb-4">Qual o teu modelo?</h1>
+                    <div class="space-y-4 max-w-xs mx-auto">
+                        <input type="text" id="phoneInput" oninput="findSmartSuggestion()" placeholder="Ex: Samsung A54, Poco X3..." class="bg-[#111] border border-[#222] text-white w-full p-5 rounded-2xl outline-none focus:border-purple-600 text-center">
+                        <div id="suggestionBox" class="suggestion-box">
+                            <p class="text-[10px] text-purple-400 font-bold mb-1 uppercase">Sugestão:</p>
+                            <button id="suggestedName" onclick="useSuggestion()" class="text-white font-extrabold text-sm hover:underline"></button>
+                        </div>
+                        <button onclick="validateModel()" class="btn-primary text-white w-full">Confirmar Modelo</button>
+                        <button onclick="hideManualInput()" class="text-gray-500 font-bold text-sm">Voltar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASSO 2 -->
+            <div class="view-step text-center">
+                <h1 class="text-3xl font-extrabold mb-10">Intensidade da Sensi</h1>
+                <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                    <button onclick="setScale(100)" class="bg-white/5 border border-white/10 p-8 rounded-3xl hover:border-purple-600 transition-all">
+                        <span class="text-3xl font-black">100</span>
+                        <p class="text-[10px] text-gray-500 font-bold mt-2">PADRÃO</p>
+                    </button>
+                    <button onclick="setScale(200)" class="bg-white/5 border border-white/10 p-8 rounded-3xl hover:border-purple-600 transition-all">
+                        <span class="text-3xl font-black text-purple-500">200</span>
+                        <p class="text-[10px] text-purple-500 font-bold mt-2">INSANA</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- PASSO 3 -->
+            <div class="view-step p-0">
+                <div class="dashboard-layout">
+                    <div class="sidebar">
+                        <div class="tab-btn active" id="tabSensi" onclick="showTab('sensi', this)">Sensi</div>
+                        <div class="tab-btn" onclick="showTab('ajustes', this)">Método</div>
+                        <div class="tab-btn" onclick="showTab('dicas', this)">Dicas</div>
+                    </div>
+                    <div class="content-display" id="tabContent"></div>
+                    
+                    <div class="refresh-circle" onclick="recalibrate()" title="Nova Configuração">
+                        <svg width="24" height="24" fill="none" stroke="white" viewBox="0 0 24 24"><path stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedModel = "";
+        let scaleValue = 100;
+        let flowIdx = 0;
+        let isIOS = false;
+        let currentTab = 'sensi';
+
+        const dbModels = [
+            "Samsung Galaxy A10", "Samsung Galaxy A14", "Samsung Galaxy A32", "Samsung Galaxy A54", "Samsung Galaxy S23 Ultra",
+            "iPhone 11", "iPhone 12 Pro", "iPhone 13 Pro Max", "iPhone 14 Plus", "iPhone 15 Pro", "iPhone XR",
+            "Xiaomi Poco X3", "Xiaomi Poco F5", "Motorola Edge 30", "Infinix Note 30"
+        ];
+
+        function updateView() {
+            document.getElementById('flow').style.transform = `translateX(-${flowIdx * 33.333}%)`;
+            document.getElementById('btnBack').classList.toggle('hidden', flowIdx === 0);
+        }
+
+        function goBack() { if(flowIdx > 0) flowIdx--; updateView(); }
+
+        function showManualInput() {
+            document.getElementById('step1-detect').classList.add('hidden');
+            document.getElementById('step1-manual').classList.remove('hidden');
+        }
+
+        function hideManualInput() {
+            document.getElementById('step1-detect').classList.remove('hidden');
+            document.getElementById('step1-manual').classList.add('hidden');
+        }
+
+        function findSmartSuggestion() {
+            const input = document.getElementById('phoneInput').value.trim().toLowerCase();
+            const box = document.getElementById('suggestionBox');
+            if (input.length < 2) { box.style.display = 'none'; return; }
+
+            let bestMatch = "";
+            let maxScore = 0;
+
+            dbModels.forEach(model => {
+                const modelLower = model.toLowerCase();
+                let score = 0;
+                const inputNum = input.match(/\d+/);
+                const modelNum = modelLower.match(/\d+/);
+                if (inputNum && modelNum && inputNum[0] === modelNum[0]) score += 70;
+                if (modelLower.includes(input)) score += 10;
+                if (score > maxScore) { maxScore = score; bestMatch = model; }
+            });
+
+            if (maxScore > 5) {
+                document.getElementById('suggestedName').innerText = bestMatch;
+                box.style.display = 'block';
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        function useSuggestion() {
+            const suggestion = document.getElementById('suggestedName').innerText;
+            document.getElementById('phoneInput').value = suggestion;
+            validateModel();
+        }
+
+        function validateModel() {
+            const val = document.getElementById('phoneInput').value.trim();
+            if(val.length < 1) return;
+            confirmHardware(val, val.toLowerCase().includes('iphone'));
+        }
+
+        function confirmHardware(m, ios) {
+            selectedModel = m;
+            isIOS = ios;
+            flowIdx = 1;
+            updateView();
+        }
+
+        function setScale(s) {
+            scaleValue = s;
+            flowIdx = 2;
+            updateView();
+            showTab('sensi', document.getElementById('tabSensi'));
+        }
+
+        function recalibrate() {
+            const content = document.getElementById('tabContent');
+            content.style.opacity = "0";
+            setTimeout(() => {
+                // Forçamos a atualização visual chamando a aba atual de novo
+                showTab(currentTab, document.querySelector('.tab-btn.active'));
+                content.style.opacity = "1";
+            }, 300);
+        }
+
+        function showTab(type, el) {
+            currentTab = type;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            
+            const container = document.getElementById('tabContent');
+            let html = `<div class="fade-in"><h2 class="text-purple-500 text-[10px] font-bold uppercase tracking-widest mb-1">${selectedModel}</h2>`;
+
+            if (type === 'sensi') {
+                html += `<h1 class="text-2xl font-extrabold mb-6">Configuração VIP</h1>`;
+                const labels = ['GERAL', 'RED DOT', 'MIRA 2X', 'MIRA 4X'];
+                labels.forEach(label => {
+                    const base = isIOS ? 95 : 88;
+                    const val = scaleValue === 200 ? Math.floor(125 + Math.random() * 75) : Math.floor(base + Math.random() * (100 - base));
+                    const max = scaleValue === 200 ? 200 : 100;
+                    const width = (val / max) * 100;
+                    html += `
+                        <div class="mb-5">
+                            <div class="flex justify-between text-[10px] font-bold mb-2"><span>${label}</span><span class="text-purple-500">${val}</span></div>
+                            <div class="h-1 bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-purple-600" style="width: ${width}%"></div></div>
+                        </div>`;
+                });
+                html += `<div class="mt-8 p-5 bg-white/5 border border-white/10 rounded-3xl flex justify-between items-center"><span class="font-bold text-sm">Botão de Tiro</span><span class="text-2xl font-black">${Math.floor(38 + Math.random() * 9)}%</span></div>`;
+            } else if (type === 'ajustes') {
+                html += `<h1 class="text-2xl font-extrabold mb-6">Método de Ajuste</h1><div class="space-y-3">`;
+                if (isIOS) {
+                    // Velocidade do cursor agora gera um valor dinâmico perto do ideal (ex: 115-120) ao recalibrar
+                    const cursorSpeed = Math.floor(116 + Math.random() * 5); 
+                    html += `
+                        <div class="tip-card"><span>Cursor Móvel</span><b class="text-purple-500">Individual</b></div>
+                        <div class="tip-card"><span>Velocidade do Cursor</span><b class="text-purple-500">${cursorSpeed}</b></div>
+                        <div class="tip-card"><span>Ciclos</span><b class="text-purple-500">${Math.floor(8+Math.random()*3)}</b></div>
+                        <div class="tip-card"><span>Tolerância</span><b class="text-purple-500">Mínima</b></div>`;
+                } else {
+                    html += `
+                        <div class="tip-card"><span>DPI Recomendada</span><b class="text-purple-500">${Math.floor(400 + Math.random()*500)}</b></div>
+                        <div class="tip-card"><span>Velocidade do Ponteiro</span><b class="text-purple-500">Máxima</b></div>
+                        <div class="tip-card"><span>Supressão</span><b class="text-purple-500">Ativado</b></div>`;
+                }
+                html += `</div>`;
+            } else {
+                html += `<h1 class="text-2xl font-extrabold mb-6">Otimização</h1>`;
+                const dicas = isIOS ? ["Reduzir Movimento: ON", "Contraste: ON", "AssistiveTouch: OFF"] : ["Forçar 4x MSAA: ON", "Animações: OFF", "Modo Jogo: ON"];
+                dicas.forEach(d => html += `<div class="tip-card"><span>${d.split(':')[0]}</span><b class="text-purple-500">${d.split(':')[1]}</b></div>`);
+            }
+            container.innerHTML = html + `</div>`;
+        }
+    </script>
+</body>
+</html>
+
