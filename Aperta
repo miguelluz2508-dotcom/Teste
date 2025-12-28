@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sensi Optimizer Pro</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fonte -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --accent-purple: #9333ea;
+      --bg-dark: #000000;
+      --card-dark: #0a0a0a;
+      --border-dark: #1f1f1f;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #ffffff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .main-stage {
+      width: 95%;
+      max-width: 750px;
+      height: 640px;
+      background: var(--card-dark);
+      border: 1px solid var(--border-dark);
+      border-radius: 40px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.9);
+      position: relative;
+    }
+
+    .flow-container {
+      display: flex;
+      width: 300%;
+      height: 100%;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .view-step {
+      width: 33.333%;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .dashboard-layout {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .sidebar {
+      width: 140px;
+      background: #050505;
+      border-right: 1px solid var(--border-dark);
+      padding: 60px 15px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .tab-btn {
+      padding: 14px 10px;
+      border-radius: 18px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #444;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-purple);
+      color: #fff;
+    }
+
+    .content-display {
+      flex: 1;
+      padding: 30px 40px;
+      overflow-y: auto;
+    }
+
+    .btn-primary {
+      background: var(--accent-purple);
+      padding: 18px;
+      border-radius: 20px;
+      font-weight: 800;
+      font-size: 16px;
+      color: #fff;
+      width: 100%;
+      transition: 0.3s;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 18px;
+      border-radius: 20px;
+      font-weight: 700;
+      color: #888;
+      width: 100%;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="main-stage">
+
+  <!-- Botão voltar -->
+  <div id="btnBack"
+       class="absolute top-8 left-8 text-purple-600 cursor-pointer hidden"
+       onclick="goBack()">
+    ←
+  </div>
+
+  <!-- Conteúdo -->
+  <div id="flow" class="flow-container">
+
+    <!-- PASSO 1 -->
+    <div class="view-step text-center fade-in">
+      <h2 class="text-purple-500 text-xs font-bold uppercase mb-2">
+        Sensi Optimizer
+      </h2>
+
+      <h1 class="text-3xl font-extrabold mb-10">
+        iPhone / iPad<br>
+        <span class="text-purple-600">Este é o teu celular?</span>
+      </h1>
+
+      <div class="space-y-4 max-w-xs mx-auto">
+        <button class="btn-primary" onclick="confirmHardware('iPhone (iOS)', true)">
+          Sim, esse é meu celular
+        </button>
+        <button class="btn-secondary" onclick="showManualInput()">
+          Não, uso outro modelo
+        </button>
+      </div>
+    </div>
+
+    <!-- PASSO 2 -->
+    <div class="view-step text-center">
+      <h1 class="text-3xl font-extrabold mb-10">Intensidade da Sensibilidade</h1>
+
+      <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+        <button onclick="setScale(100)" class="p-8 rounded-3xl bg-white/5 border">
+          <span class="text-3xl font-black">100</span>
+          <p class="text-xs text-gray-500 font-bold mt-2">PADRÃO</p>
+        </button>
+
+        <button onclick="setScale(200)" class="p-8 rounded-3xl bg-white/5 border">
+          <span class="text-3xl font-black text-purple-500">200</span>
+          <p class="text-xs text-purple-500 font-bold mt-2">INSANA</p>
+        </button>
+      </div>
+    </div>
+
+    <!-- PASSO 3 -->
+    <div class="view-step p-0">
+      <div class="dashboard-layout">
+
+        <div class="sidebar">
+          <div class="tab-btn active" id="tabSensi" onclick="showTab('sensi', this)">Sensi</div>
+          <div class="tab-btn" onclick="showTab('ajustes', this)">Método</div>
+          <div class="tab-btn" onclick="showTab('dicas', this)">Dicas</div>
+        </div>
+
+        <div id="tabContent" class="content-display"></div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let selectedModel = '';
+  let scaleValue = 100;
+  let flowIdx = 0;
+  let isIOS = false;
+  let currentTab = 'sensi';
+
+  function updateView() {
+    document.getElementById('flow').style.transform =
+      `translateX(-${flowIdx * 33.333}%)`;
+
+    document.getElementById('btnBack')
+      .classList.toggle('hidden', flowIdx === 0);
+  }
+
+  function goBack() {
+    if (flowIdx > 0) flowIdx--;
+    updateView();
+  }
+
+  function confirmHardware(model, ios) {
+    selectedModel = model;
+    isIOS = ios;
+    flowIdx = 1;
+    updateView();
+  }
+
+  function setScale(value) {
+    scaleValue = value;
+    flowIdx = 2;
+    updateView();
+    showTab('sensi', document.getElementById('tabSensi'));
+  }
+
+  function showTab(type, el) {
+    currentTab = type;
+    document.querySelectorAll('.tab-btn')
+      .forEach(b => b.classList.remove('active'));
+
+    el.classList.add('active');
+
+    const content = document.getElementById('tabContent');
+    content.innerHTML = `
+      <h2 class="text-purple-500 text-xs font-bold uppercase mb-1">${selectedModel}</h2>
+      <h1 class="text-2xl font-extrabold mb-6">Configuração Otimizada</h1>
+      <p class="text-gray-400 text-sm">
+        Sensibilidade ajustada automaticamente para ${scaleValue}%.
+      </p>
+    `;
+  }
+</script>
+
+</body>
+</html>
